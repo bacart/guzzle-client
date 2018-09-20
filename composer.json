@@ -17,7 +17,6 @@
         "sort-packages": true
     },
     "autoload": {
-        "files": ["src/functions.php"],
         "psr-4": {
             "Bacart\\GuzzleClient\\": "src/"
         }
