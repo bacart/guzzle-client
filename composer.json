@@ -10,8 +10,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.1",
-        "bacart/common": "^0.1",
-        "bacart/symfony-aware": "^0.1"
+        "bacart/common": "^0.1"
     },
     "require-dev": {
         "phpstan/phpstan": "^0.10.3"
