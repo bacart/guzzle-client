@@ -16,11 +16,11 @@ class GuzzleClient extends Client implements GuzzleClientInterface
     /**
      * {@inheritdoc}
      *
-     * @param \Traversable|callable[]|null $middlewares
+     * @param iterable|callable[]|null $middlewares
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $config = [], \Traversable $middlewares = null)
+    public function __construct(array $config = [], iterable $middlewares = null)
     {
         $handlerStack = $config['handler'] ?? HandlerStack::create();
 
@@ -29,6 +29,8 @@ class GuzzleClient extends Client implements GuzzleClientInterface
                 $handlerStack->push($middleware);
             }
         }
+
+        $config['handler'] = $handlerStack;
 
         parent::__construct($config);
     }

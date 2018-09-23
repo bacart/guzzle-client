@@ -20,14 +20,6 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     protected const DEBUG_HEADER_HIT = 'HIT';
     protected const DEBUG_HEADER_MISS = 'MISS';
 
-    protected const URI = 'uri';
-    protected const STATUS = 'status';
-    protected const METHOD = 'method';
-    protected const BODY = 'body';
-    protected const HEADERS = 'headers';
-    protected const VERSION = 'version';
-    protected const REASON = 'reason';
-
     /** @var CacheItemPoolInterface */
     protected $cache;
 
@@ -43,7 +35,7 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     /**
      * @param CacheItemPoolInterface $cache
      * @param bool                   $debug
-     * @param LoggerInterface        $logger
+     * @param LoggerInterface|null   $logger
      * @param string                 $cacheTtl
      */
     public function __construct(
@@ -64,7 +56,7 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     public function __invoke(callable $handler): callable
     {
         return function (RequestInterface $request, array $options) use ($handler) {
-            $cache = $options[static::CACHE] ?? false;
+            $cache = $options[static::CACHE] ?? true;
 
             unset($options[static::CACHE]);
 
@@ -90,11 +82,11 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
             $data = $cacheItem->get();
 
             $response = new Response(
-                $data[static::STATUS],
-                $data[static::HEADERS],
-                $data[static::BODY],
-                $data[static::VERSION],
-                $data[static::REASON]
+                $data[GuzzleClientMiddlewareInterface::STATUS],
+                $data[GuzzleClientMiddlewareInterface::HEADERS],
+                $data[GuzzleClientMiddlewareInterface::BODY],
+                $data[GuzzleClientMiddlewareInterface::VERSION],
+                $data[GuzzleClientMiddlewareInterface::REASON]
             );
 
             $response = $this->addDebugHeader(
@@ -125,11 +117,11 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
                 $item = $this->cache->getItem($key)
                     ->expiresAfter(new \DateInterval($this->cacheTtl))
                     ->set([
-                        static::STATUS  => $response->getStatusCode(),
-                        static::HEADERS => $response->getHeaders(),
-                        static::BODY    => (string) $response->getBody(),
-                        static::VERSION => $response->getProtocolVersion(),
-                        static::REASON  => $response->getReasonPhrase(),
+                        GuzzleClientMiddlewareInterface::STATUS  => $response->getStatusCode(),
+                        GuzzleClientMiddlewareInterface::HEADERS => $response->getHeaders(),
+                        GuzzleClientMiddlewareInterface::BODY    => (string) $response->getBody(),
+                        GuzzleClientMiddlewareInterface::VERSION => $response->getProtocolVersion(),
+                        GuzzleClientMiddlewareInterface::REASON  => $response->getReasonPhrase(),
                     ]);
 
                 $this->cache->save($item);
@@ -150,10 +142,10 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     protected function getCacheKey(RequestInterface $request): string
     {
         return static::CACHE_KEY_PREFIX.'|'.md5(serialize([
-                static::BODY    => (string) $request->getBody(),
-                static::HEADERS => $request->getHeaders(),
-                static::METHOD  => $request->getMethod(),
-                static::URI     => $request->getUri(),
+                GuzzleClientMiddlewareInterface::BODY    => (string) $request->getBody(),
+                GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
+                GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
+                GuzzleClientMiddlewareInterface::URI     => $request->getUri(),
             ]));
     }
 
