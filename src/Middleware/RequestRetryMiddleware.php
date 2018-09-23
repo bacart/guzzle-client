@@ -37,9 +37,7 @@ class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
-        return function (callable $handler) {
-            return new RetryMiddleware([$this, 'decider'], $handler);
-        };
+        return new RetryMiddleware([$this, 'decider'], $handler);
     }
 
     /**
@@ -50,7 +48,7 @@ class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
      *
      * @return bool
      */
-    protected function decider(
+    public function decider(
         int $retries,
         Request $request,
         Response $response = null,
