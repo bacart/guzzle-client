@@ -26,7 +26,7 @@ class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __construct(
         LoggerInterface $logger = null,
-        $maxRetries = self::MAX_RETRIES
+        int $maxRetries = self::MAX_RETRIES
     ) {
         $this->logger = $logger;
         $this->maxRetries = $maxRetries;

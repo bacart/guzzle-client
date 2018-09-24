@@ -16,6 +16,8 @@ class GuzzleClient extends Client implements GuzzleClientInterface
     /**
      * {@inheritdoc}
      *
+     * @param iterable|callable[]|null $middlewares
+     *
      * @throws \InvalidArgumentException
      */
     public function __construct(

@@ -23,17 +23,8 @@ interface GuzzleClientInterface extends ClientInterface
     public const METHOD_TRACE = 'TRACE';
     public const METHOD_CONNECT = 'CONNECT';
     public const METHOD_PROPFIND = 'PROPFIND';
+    public const METHOD_PROPPATCH = 'PROPPATCH';
     public const METHOD_MKCOL = 'MKCOL';
-
-    /**
-     * {@inheritdoc}
-     *
-     * @param iterable|callable[]|null $middlewares
-     */
-    public function __construct(
-        array $config = [],
-        iterable $middlewares = null
-    );
 
     /**
      * @param string $uri
