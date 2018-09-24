@@ -3,11 +3,15 @@
 namespace Bacart\GuzzleClient\Client;
 
 use Bacart\GuzzleClient\Exception\GuzzleClientException;
+use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use Wa72\HtmlPageDom\HtmlPageCrawler;
 
-interface GuzzleClientInterface
+interface GuzzleClientInterface extends ClientInterface
 {
+    public const CONFIG_HANDLER = 'handler';
+    public const BASE_URI = 'base_uri';
+
     public const METHOD_HEAD = 'HEAD';
     public const METHOD_GET = 'GET';
     public const METHOD_POST = 'POST';
@@ -20,6 +24,16 @@ interface GuzzleClientInterface
     public const METHOD_CONNECT = 'CONNECT';
     public const METHOD_PROPFIND = 'PROPFIND';
     public const METHOD_MKCOL = 'MKCOL';
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param iterable|callable[]|null $middlewares
+     */
+    public function __construct(
+        array $config = [],
+        iterable $middlewares = null
+    );
 
     /**
      * @param string $uri

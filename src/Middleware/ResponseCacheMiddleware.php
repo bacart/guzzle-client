@@ -12,6 +12,7 @@ use Psr\Log\LoggerInterface;
 class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
 {
     public const CACHE = 'cache';
+    public const CACHE_TTL = 'PT1H';
 
     protected const CACHE_KEY_PREFIX = 'guzzle_cache';
 
@@ -42,7 +43,7 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
         CacheItemPoolInterface $cache,
         bool $debug,
         LoggerInterface $logger = null,
-        string $cacheTtl = 'PT1H'
+        string $cacheTtl = self::CACHE_TTL
     ) {
         $this->cache = $cache;
         $this->logger = $logger;

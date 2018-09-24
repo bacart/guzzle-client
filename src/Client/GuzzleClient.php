@@ -16,13 +16,13 @@ class GuzzleClient extends Client implements GuzzleClientInterface
     /**
      * {@inheritdoc}
      *
-     * @param iterable|callable[]|null $middlewares
-     *
      * @throws \InvalidArgumentException
      */
-    public function __construct(array $config = [], iterable $middlewares = null)
-    {
-        $handlerStack = $config['handler'] ?? HandlerStack::create();
+    public function __construct(
+        array $config = [],
+        iterable $middlewares = null
+    ) {
+        $handlerStack = $config[GuzzleClientInterface::CONFIG_HANDLER] ?? HandlerStack::create();
 
         if (null !== $middlewares) {
             foreach ($middlewares as $middleware) {
@@ -30,7 +30,7 @@ class GuzzleClient extends Client implements GuzzleClientInterface
             }
         }
 
-        $config['handler'] = $handlerStack;
+        $config[GuzzleClientInterface::CONFIG_HANDLER] = $handlerStack;
 
         parent::__construct($config);
     }
