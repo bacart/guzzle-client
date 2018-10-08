@@ -143,11 +143,11 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     protected function getCacheKey(RequestInterface $request): string
     {
         return static::CACHE_KEY_PREFIX.'|'.md5(serialize([
-                GuzzleClientMiddlewareInterface::BODY    => (string) $request->getBody(),
-                GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
-                GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
-                GuzzleClientMiddlewareInterface::URI     => $request->getUri(),
-            ]));
+            GuzzleClientMiddlewareInterface::BODY    => (string) $request->getBody(),
+            GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
+            GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
+            GuzzleClientMiddlewareInterface::URI     => $request->getUri(),
+        ]));
     }
 
     /**
