@@ -106,6 +106,12 @@ class GuzzleClient extends Client implements GuzzleClientInterface
             $method
         );
 
-        return new HtmlPageCrawler($stringResponse);
+        $parseUrl = parse_url($uri);
+
+        return new HtmlPageCrawler(
+            $stringResponse,
+            $uri,
+            $parseUrl['scheme'].'://'.$parseUrl['host']
+        );
     }
 }
