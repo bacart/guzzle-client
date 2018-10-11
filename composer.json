@@ -23,6 +23,7 @@
     },
     "suggest": {
         "phpstan/phpstan": "PHPStan - PHP Static Analysis Tool",
+        "symfony/dom-crawler": "The DomCrawler component eases DOM navigation for HTML and XML documents.",
         "wa72/htmlpagedom": "PHP implementation of the jQuery DOM manipulation API for HTML documents"
     },
     "config": {
