@@ -35,14 +35,14 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
 
     /**
      * @param CacheItemPoolInterface $cache
-     * @param bool                   $debug
      * @param LoggerInterface|null   $logger
+     * @param bool                   $debug
      * @param string                 $cacheTtl
      */
     public function __construct(
         CacheItemPoolInterface $cache,
-        bool $debug,
         LoggerInterface $logger = null,
+        bool $debug = false,
         string $cacheTtl = self::CACHE_TTL
     ) {
         $this->cache = $cache;
@@ -146,7 +146,7 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
             GuzzleClientMiddlewareInterface::BODY    => (string) $request->getBody(),
             GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
             GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
-            GuzzleClientMiddlewareInterface::URI     => $request->getUri(),
+            GuzzleClientMiddlewareInterface::URI     => (string) $request->getUri(),
         ]));
     }
 

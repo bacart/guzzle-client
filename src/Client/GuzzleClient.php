@@ -3,13 +3,15 @@
 namespace Bacart\GuzzleClient\Client;
 
 use Bacart\Common\Exception\JsonException;
+use Bacart\Common\Exception\MissingPackageException;
 use Bacart\Common\Util\JsonUtils;
 use Bacart\GuzzleClient\Exception\GuzzleClientException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
 use Psr\Http\Message\ResponseInterface;
-use Wa72\HtmlPageDom\HtmlPageCrawler;
+use Symfony\Component\DomCrawler\Crawler;
+use Wa72\HtmlPageDom\HtmlPage;
 
 class GuzzleClient extends Client implements GuzzleClientInterface
 {
@@ -95,11 +97,11 @@ class GuzzleClient extends Client implements GuzzleClientInterface
     /**
      * {@inheritdoc}
      */
-    public function getGuzzleResponseAsHtmlPageCrawler(
+    public function getGuzzleResponseAsCrawler(
         string $uri,
         array $options = [],
         string $method = GuzzleClientInterface::METHOD_GET
-    ): HtmlPageCrawler {
+    ): Crawler {
         $stringResponse = $this->getGuzzleResponseAsString(
             $uri,
             $options,
@@ -108,10 +110,36 @@ class GuzzleClient extends Client implements GuzzleClientInterface
 
         $parseUrl = parse_url($uri);
 
-        return new HtmlPageCrawler(
+        return new Crawler(
             $stringResponse,
             $uri,
             $parseUrl['scheme'].'://'.$parseUrl['host']
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws MissingPackageException
+     */
+    public function getGuzzleResponseAsHtmlPage(
+        string $uri,
+        array $options = [],
+        string $method = GuzzleClientInterface::METHOD_GET
+    ): HtmlPage {
+        if (!class_exists('Wa72\\HtmlPageDom\\HtmlPage')) {
+            throw new MissingPackageException('wa72/htmlpagedom');
+        }
+
+        $stringResponse = $this->getGuzzleResponseAsString(
+            $uri,
+            $options,
+            $method
+        );
+
+        return new HtmlPage(
+            $stringResponse,
+            $uri
         );
     }
 }

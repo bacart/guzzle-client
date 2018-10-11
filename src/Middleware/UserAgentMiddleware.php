@@ -6,7 +6,7 @@ use Psr\Http\Message\RequestInterface;
 
 class UserAgentMiddleware implements GuzzleClientMiddlewareInterface
 {
-    protected const USER_AGENT_HEADER = 'User-Agent';
+    public const USER_AGENT_HEADER = 'User-Agent';
 
     // See https://techblog.willshouse.com/2012/01/03/most-common-user-agents/ for actual list
     protected const USER_AGENTS = [

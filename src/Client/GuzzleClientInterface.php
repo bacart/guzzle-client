@@ -5,7 +5,8 @@ namespace Bacart\GuzzleClient\Client;
 use Bacart\GuzzleClient\Exception\GuzzleClientException;
 use GuzzleHttp\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
-use Wa72\HtmlPageDom\HtmlPageCrawler;
+use Symfony\Component\DomCrawler\Crawler;
+use Wa72\HtmlPageDom\HtmlPage;
 
 interface GuzzleClientInterface extends ClientInterface
 {
@@ -131,11 +132,26 @@ interface GuzzleClientInterface extends ClientInterface
      *
      * @throws GuzzleClientException
      *
-     * @return HtmlPageCrawler
+     * @return Crawler
      */
-    public function getGuzzleResponseAsHtmlPageCrawler(
+    public function getGuzzleResponseAsCrawler(
         string $uri,
         array $options = [],
         string $method = self::METHOD_GET
-    ): HtmlPageCrawler;
+    ): Crawler;
+
+    /**
+     * @param string $uri
+     * @param array  $options
+     * @param string $method
+     *
+     * @throws GuzzleClientException
+     *
+     * @return HtmlPage
+     */
+    public function getGuzzleResponseAsHtmlPage(
+        string $uri,
+        array $options = [],
+        string $method = self::METHOD_GET
+    ): HtmlPage;
 }
