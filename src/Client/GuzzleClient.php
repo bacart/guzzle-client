@@ -96,6 +96,8 @@ class GuzzleClient extends Client implements GuzzleClientInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws MissingPackageException
      */
     public function getGuzzleResponseAsCrawler(
         string $uri,
