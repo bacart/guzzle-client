@@ -102,6 +102,10 @@ class GuzzleClient extends Client implements GuzzleClientInterface
         array $options = [],
         string $method = GuzzleClientInterface::METHOD_GET
     ): Crawler {
+        if (!class_exists('Symfony\Component\DomCrawler\Crawler')) {
+            throw new MissingPackageException('symfony/dom-crawler');
+        }
+
         $stringResponse = $this->getGuzzleResponseAsString(
             $uri,
             $options,
@@ -127,7 +131,7 @@ class GuzzleClient extends Client implements GuzzleClientInterface
         array $options = [],
         string $method = GuzzleClientInterface::METHOD_GET
     ): HtmlPage {
-        if (!class_exists('Wa72\\HtmlPageDom\\HtmlPage')) {
+        if (!class_exists('Wa72\HtmlPageDom\HtmlPage')) {
             throw new MissingPackageException('wa72/htmlpagedom');
         }
 
