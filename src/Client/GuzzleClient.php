@@ -114,12 +114,16 @@ class GuzzleClient extends Client implements GuzzleClientInterface
             $method
         );
 
-        $parseUrl = parse_url($uri);
+        $baseHref = trim($uri, '/');
+        $baseUri = rtrim(
+            $this->getConfig(GuzzleClientInterface::BASE_URI),
+            '/'
+        );
 
         return new Crawler(
             $stringResponse,
-            $uri,
-            $parseUrl['scheme'].'://'.$parseUrl['host']
+            $baseUri.'/'.$baseHref,
+            $uri
         );
     }
 
