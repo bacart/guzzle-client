@@ -11,7 +11,7 @@ class GuzzleMessageFormatter extends MessageFormatter
     protected const CREDENTIAL_REPLACEMENT = '******';
 
     /** @var string[] */
-    protected $credentialsToReplace = [];
+    protected $credentialsToReplace;
 
     /**
      * @param string[] $credentialsToReplace
