@@ -44,8 +44,6 @@ class GuzzleClient extends Client implements GuzzleClientInterface
      * {@inheritdoc}
      *
      * @throws GuzzleClientException
-     *
-     * @psalm-suppress InvalidCatch
      */
     public function getGuzzleResponse(
         string $uri,
