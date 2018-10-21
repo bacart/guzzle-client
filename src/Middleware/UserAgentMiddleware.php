@@ -109,7 +109,7 @@ class UserAgentMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
-        return function (RequestInterface $request, array $options) use ($handler) {
+        return function (RequestInterface $request, array $options) use ($handler): callable {
             $request = $request->withHeader(
                 static::USER_AGENT_HEADER,
                 $this->userAgents[array_rand($this->userAgents)]

@@ -2,6 +2,7 @@
 
 namespace Bacart\GuzzleClient\Middleware;
 
+use Bacart\GuzzleClient\Client\GuzzleClientInterface;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\Request;
@@ -11,7 +12,6 @@ use Psr\Log\LoggerInterface;
 
 class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
 {
-    protected const HTTP_INTERNAL_SERVER_ERROR = 500;
     protected const MAX_RETRIES = 2;
 
     /** @var LoggerInterface|null */
@@ -54,22 +54,22 @@ class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
         Response $response = null,
         RequestException $exception = null
     ): bool {
-        if (!($exception instanceof ConnectException)
-            || null === $response
-            || $response->getStatusCode() < static::HTTP_INTERNAL_SERVER_ERROR) {
-            return false;
-        }
+        $statusCode = null !== $response ? $response->getStatusCode() : 0;
 
-        $retryNeeded = $retries < $this->maxRetries;
+        $retryNeeded = $retries < $this->maxRetries
+            && ($exception instanceof ConnectException
+                || $statusCode > GuzzleClientInterface::HTTP_INTERNAL_SERVER_ERROR);
 
         if ($retryNeeded && null !== $this->logger) {
+            $context = [
+                GuzzleClientMiddlewareInterface::STATUS => $statusCode,
+                GuzzleClientMiddlewareInterface::URI    => (string) $request->getUri(),
+                GuzzleClientMiddlewareInterface::METHOD => $request->getMethod(),
+            ];
+
             $this->logger->warning(
                 sprintf('Request retry (%d)', $retries),
-                [
-                    GuzzleClientMiddlewareInterface::STATUS => null === $response ? 0 : $response->getStatusCode(),
-                    GuzzleClientMiddlewareInterface::URI    => (string) $request->getUri(),
-                    GuzzleClientMiddlewareInterface::METHOD => $request->getMethod(),
-                ]
+                $context
             );
         }
 

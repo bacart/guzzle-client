@@ -26,21 +26,26 @@ class GuzzleClient extends Client implements GuzzleClientInterface
         array $config = [],
         iterable $middlewares = null
     ) {
-        $handlerStack = $config[GuzzleClientInterface::CONFIG_HANDLER] ?? HandlerStack::create();
-
         if (null !== $middlewares) {
+            $handlerStack = $config[GuzzleClientInterface::CONFIG_HANDLER]
+                ?? HandlerStack::create();
+
             foreach ($middlewares as $middleware) {
                 $handlerStack->push($middleware);
             }
-        }
 
-        $config[GuzzleClientInterface::CONFIG_HANDLER] = $handlerStack;
+            $config[GuzzleClientInterface::CONFIG_HANDLER] = $handlerStack;
+        }
 
         parent::__construct($config);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @throws GuzzleClientException
+     *
+     * @psalm-suppress InvalidCatch
      */
     public function getGuzzleResponse(
         string $uri,
@@ -60,6 +65,8 @@ class GuzzleClient extends Client implements GuzzleClientInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws GuzzleClientException
      */
     public function getGuzzleResponseAsString(
         string $uri,
@@ -75,6 +82,8 @@ class GuzzleClient extends Client implements GuzzleClientInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws GuzzleClientException
      */
     public function getGuzzleResponseAsJson(
         string $uri,
@@ -98,6 +107,7 @@ class GuzzleClient extends Client implements GuzzleClientInterface
      * {@inheritdoc}
      *
      * @throws MissingPackageException
+     * @throws GuzzleClientException
      */
     public function getGuzzleResponseAsCrawler(
         string $uri,
@@ -131,6 +141,7 @@ class GuzzleClient extends Client implements GuzzleClientInterface
      * {@inheritdoc}
      *
      * @throws MissingPackageException
+     * @throws GuzzleClientException
      */
     public function getGuzzleResponseAsHtmlPage(
         string $uri,

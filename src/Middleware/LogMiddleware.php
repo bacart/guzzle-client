@@ -38,6 +38,11 @@ class LogMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
+        // TODO: check with a NULL logger
+        if (null === $this->logger) {
+            return $handler;
+        }
+
         return Middleware::log(
             $this->logger,
             $this->formatter,

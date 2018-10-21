@@ -3,6 +3,7 @@
 namespace Bacart\GuzzleClient\Middleware;
 
 use GuzzleHttp\Promise\FulfilledPromise;
+use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Cache\CacheItemPoolInterface;
 use Psr\Http\Message\RequestInterface;
@@ -56,14 +57,14 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
-        return function (RequestInterface $request, array $options) use ($handler) {
+        return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
             $cache = $options[static::CACHE] ?? true;
 
             unset($options[static::CACHE]);
 
             if (!$cache) {
                 return $handler($request, $options)->then(
-                    function (ResponseInterface $response) {
+                    function (ResponseInterface $response): ResponseInterface {
                         return $response;
                     }
                 );
@@ -112,7 +113,7 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
         array $options
     ) {
         return $handler($request, $options)->then(
-            function (ResponseInterface $response) use ($request) {
+            function (ResponseInterface $response) use ($request): ResponseInterface {
                 $key = $this->getCacheKey($request);
 
                 $item = $this->cache->getItem($key)
