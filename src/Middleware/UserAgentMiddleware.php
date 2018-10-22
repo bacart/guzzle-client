@@ -2,6 +2,7 @@
 
 namespace Bacart\GuzzleClient\Middleware;
 
+use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 
 class UserAgentMiddleware implements GuzzleClientMiddlewareInterface
@@ -109,7 +110,7 @@ class UserAgentMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
-        return function (RequestInterface $request, array $options) use ($handler): callable {
+        return function (RequestInterface $request, array $options) use ($handler): PromiseInterface {
             $request = $request->withHeader(
                 static::USER_AGENT_HEADER,
                 $this->userAgents[array_rand($this->userAgents)]

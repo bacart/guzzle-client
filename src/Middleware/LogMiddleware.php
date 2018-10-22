@@ -38,7 +38,6 @@ class LogMiddleware implements GuzzleClientMiddlewareInterface
      */
     public function __invoke(callable $handler): callable
     {
-        // TODO: check with a NULL logger
         if (null === $this->logger) {
             return $handler;
         }
