@@ -68,7 +68,7 @@ class RequestRetryMiddleware implements GuzzleClientMiddlewareInterface
             ];
 
             $this->logger->warning(
-                sprintf('Request retry (%d)', $retries),
+                sprintf('Guzzle request retry (%d)', $retries),
                 $context
             );
         }

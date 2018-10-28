@@ -159,7 +159,15 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
             return false;
         }
 
-        return $this->cache->save($cacheItem);
+        $result = $this->cache->save($cacheItem);
+
+        if ($result && null !== $this->logger) {
+            $this->logger->info('Guzzle request result is saved to cache', [
+                GuzzleClientMiddlewareInterface::URI => (string) $request->getUri(),
+            ]);
+        }
+
+        return $result;
     }
 
     /**
