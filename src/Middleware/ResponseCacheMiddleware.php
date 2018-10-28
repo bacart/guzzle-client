@@ -117,11 +117,11 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
         rewind_body($request);
 
         return static::CACHE_KEY_PREFIX.'|'.md5(serialize([
-                GuzzleClientMiddlewareInterface::BODY    => $body,
-                GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
-                GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
-                GuzzleClientMiddlewareInterface::URI     => (string) $request->getUri(),
-            ]));
+            GuzzleClientMiddlewareInterface::BODY    => $body,
+            GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
+            GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
+            GuzzleClientMiddlewareInterface::URI     => (string) $request->getUri(),
+        ]));
     }
 
     /**
