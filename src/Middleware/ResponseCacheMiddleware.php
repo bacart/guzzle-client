@@ -6,9 +6,11 @@ use GuzzleHttp\Promise\FulfilledPromise;
 use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response;
 use Psr\Cache\CacheItemPoolInterface;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use function GuzzleHttp\Psr7\rewind_body;
 
 class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
 {
@@ -63,22 +65,26 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
             unset($options[static::CACHE]);
 
             if (!$cache) {
+                return $handler($request, $options);
+            }
+
+            $key = $this->getCacheItemKey($request);
+            $cacheItem = $this->cache->getItem($key);
+
+            if (!$cacheItem->isHit()) {
                 return $handler($request, $options)->then(
-                    function (ResponseInterface $response): ResponseInterface {
-                        return $response;
+                    function (ResponseInterface $response) use ($request): ResponseInterface {
+                        return $this->saveToCache($request, $response)
+                            ? $this->addDebugHeader($response, static::DEBUG_HEADER_MISS)
+                            : $response;
                     }
                 );
             }
 
-            $key = $this->getCacheKey($request);
-            $cacheItem = $this->cache->getItem($key);
-
-            if (!$cacheItem->isHit()) {
-                return $this->cacheSave($handler, $request, $options);
-            }
-
             if (null !== $this->logger) {
-                $this->logger->info('Request result was taken from cache');
+                $this->logger->info('Guzzle request result is taken from cache', [
+                    GuzzleClientMiddlewareInterface::URI => (string) $request->getUri(),
+                ]);
             }
 
             $data = $cacheItem->get();
@@ -101,54 +107,59 @@ class ResponseCacheMiddleware implements GuzzleClientMiddlewareInterface
     }
 
     /**
-     * @param callable         $handler
-     * @param RequestInterface $request
-     * @param array            $options
-     *
-     * @return mixed
-     */
-    protected function cacheSave(
-        callable $handler,
-        RequestInterface $request,
-        array $options
-    ) {
-        return $handler($request, $options)->then(
-            function (ResponseInterface $response) use ($request): ResponseInterface {
-                $key = $this->getCacheKey($request);
-
-                $item = $this->cache->getItem($key)
-                    ->expiresAfter(new \DateInterval($this->cacheTtl))
-                    ->set([
-                        GuzzleClientMiddlewareInterface::STATUS  => $response->getStatusCode(),
-                        GuzzleClientMiddlewareInterface::HEADERS => $response->getHeaders(),
-                        GuzzleClientMiddlewareInterface::BODY    => (string) $response->getBody(),
-                        GuzzleClientMiddlewareInterface::VERSION => $response->getProtocolVersion(),
-                        GuzzleClientMiddlewareInterface::REASON  => $response->getReasonPhrase(),
-                    ]);
-
-                $this->cache->save($item);
-
-                return $this->addDebugHeader(
-                    $response,
-                    static::DEBUG_HEADER_MISS
-                );
-            }
-        );
-    }
-
-    /**
      * @param RequestInterface $request
      *
      * @return string
      */
-    protected function getCacheKey(RequestInterface $request): string
+    protected function getCacheItemKey(RequestInterface $request): string
     {
+        $body = (string) $request->getBody();
+        rewind_body($request);
+
         return static::CACHE_KEY_PREFIX.'|'.md5(serialize([
-            GuzzleClientMiddlewareInterface::BODY    => (string) $request->getBody(),
-            GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
-            GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
-            GuzzleClientMiddlewareInterface::URI     => (string) $request->getUri(),
-        ]));
+                GuzzleClientMiddlewareInterface::BODY    => $body,
+                GuzzleClientMiddlewareInterface::HEADERS => $request->getHeaders(),
+                GuzzleClientMiddlewareInterface::METHOD  => $request->getMethod(),
+                GuzzleClientMiddlewareInterface::URI     => (string) $request->getUri(),
+            ]));
+    }
+
+    /**
+     * @param RequestInterface  $request
+     * @param ResponseInterface $response
+     *
+     * @return bool
+     */
+    protected function saveToCache(
+        RequestInterface $request,
+        ResponseInterface $response
+    ): bool {
+        $key = $this->getCacheItemKey($request);
+
+        try {
+            $body = (string) $response->getBody();
+            rewind_body($response);
+
+            $cacheItem = $this
+                ->cache
+                ->getItem($key)
+                ->expiresAfter(new \DateInterval($this->cacheTtl))
+                ->set([
+                    GuzzleClientMiddlewareInterface::BODY    => $body,
+                    GuzzleClientMiddlewareInterface::HEADERS => $response->getHeaders(),
+                    GuzzleClientMiddlewareInterface::STATUS  => $response->getStatusCode(),
+                    GuzzleClientMiddlewareInterface::REASON  => $response->getReasonPhrase(),
+                    GuzzleClientMiddlewareInterface::VERSION => $response->getProtocolVersion(),
+                ]);
+        } catch (InvalidArgumentException | \Exception $e) {
+            if (null !== $this->logger) {
+                $this->logger->error($e->getMessage());
+            }
+
+            return false;
+        }
+
+        return $this->cache->save($cacheItem);
     }
 
     /**
