@@ -37,6 +37,7 @@ return PhpCsFixer\Config::create()
         'phpdoc_add_missing_param_annotation' => ['only_untyped' => false],
         'phpdoc_align' => true,
         'phpdoc_order' => true,
+        'self_accessor' => false,
         'semicolon_after_instruction' => true,
         'strict_comparison' => true,
         'strict_param' => true,
