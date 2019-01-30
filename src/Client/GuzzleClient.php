@@ -18,6 +18,7 @@ use Bacart\GuzzleClient\Exception\GuzzleClientException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\DomCrawler\Crawler;
 use Wa72\HtmlPageDom\HtmlPage;
@@ -68,6 +69,22 @@ class GuzzleClient extends Client implements GuzzleClientInterface
         } catch (GuzzleException $e) {
             throw new GuzzleClientException($e);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @throws GuzzleClientException
+     */
+    public function writeGuzzleResponseToFile(
+        string $uri,
+        string $filename,
+        array $options = [],
+        string $method = self::METHOD_GET
+    ): ResponseInterface {
+        return $this->getGuzzleResponse($uri, $options + [
+            RequestOptions::SINK => $filename,
+        ], $method);
     }
 
     /**

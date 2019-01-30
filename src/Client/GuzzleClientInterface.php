@@ -121,6 +121,21 @@ interface GuzzleClientInterface extends ClientInterface
 
     /**
      * @param string $uri
+     * @param string $filename
+     * @param array  $options
+     * @param string $method
+     *
+     * @return ResponseInterface
+     */
+    public function writeGuzzleResponseToFile(
+        string $uri,
+        string $filename,
+        array $options = [],
+        string $method = self::METHOD_GET
+    ): ResponseInterface;
+
+    /**
+     * @param string $uri
      * @param array  $options
      * @param string $method
      *
